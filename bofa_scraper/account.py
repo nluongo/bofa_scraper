@@ -4,7 +4,9 @@ from selenium.webdriver.common.by import By
 
 class Transaction:
 	amount: float
+	balance: float
 	date: str
+	trans_date: str
 	desc: str
 	type: str
 	uuid: str

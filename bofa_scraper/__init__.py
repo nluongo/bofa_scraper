@@ -62,7 +62,6 @@ class BofAScraper:
 			print("input 2fa code: ")
 			Timeout.timeout()
 			self.driver.find_element(By.CLASS_NAME, "authcode").send_keys(input())
-			self.driver.find_element(By.ID, "yes-recognize").click()
 			self.driver.find_element(By.ID, "continue-auth-number").click()
 			Timeout.timeout()
 
@@ -72,3 +71,4 @@ class BofAScraper:
 		else:
 			Log.log('Sign in failed')
 			self.logged_in = False
+

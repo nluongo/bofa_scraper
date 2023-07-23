@@ -1,9 +1,13 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from .account import Account, Transaction
 from .util import Log, Timeout
+
+import time
 
 class ScrapeSession:
 	driver: webdriver.Firefox
@@ -32,16 +36,28 @@ class ScrapeSession:
 		i: int = 0
 		out: list[Transaction] = []
 		row: WebElement
-		for row in self.driver.find_elements(By.CLASS_NAME, "activity-row"):
+		table_id = 'transactions'
+		table = self.driver.find_element(By.ID, table_id)
+		body = table.find_element(By.TAG_NAME, "tbody")
+		rows = body.find_elements(By.TAG_NAME, "tr")
+        Log.log('%d transactions found.' % (len(rows))) 
+		for i, row in enumerate(rows):
+			cell = row.find_element(By.TAG_NAME, "td")
+			expander = cell.find_element(By.TAG_NAME, "a")
+			self.driver.execute_script("arguments[0].scrollIntoView();", expander)
+			WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((expander)))
+			time.sleep(0.1)
+			expander.click()
+			time.sleep(0.1)
 			transaction = Transaction()
-			transaction.amount = float(row.find_element(By.CLASS_NAME, "amount-cell").text.replace(",","").replace("$",""))
-			transaction.date = row.find_element(By.CLASS_NAME, "date-cell").text
-			transaction.desc = row.find_element(By.CLASS_NAME, "desc-cell").text.replace("\nView/Edit","")
-			transaction.type = row.find_element(By.CLASS_NAME, "type-cell").text
-			transaction.uuid = row.get_attribute("class").split(" ")[1]
+			transaction.amount = float(row.find_element(By.CLASS_NAME, "trans-amount-cell").text.replace(",","").replace("$",""))
+			transaction.balance = float(row.find_element(By.CLASS_NAME, "trans-balance-cell").text.replace(",","").replace("$",""))
+			transaction.date = row.find_element(By.CLASS_NAME, "trans-date-cell").text
+			transaction.desc = row.find_element(By.CLASS_NAME, "expand-trans-from-desc").text
+			transaction.trans_date = row.find_element(By.CLASS_NAME, "second-expanded-cell").text
 
 			out.append(transaction)
-			i = i + 1
+			expander.click()
 		Log.log('Found %d transactions on account %s' % (i, self.account.get_name()))
 		self.account.set_transactions(out)
 		return self
