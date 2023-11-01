@@ -11,5 +11,8 @@ dependencies = [
 	"selenium"
 ]
 
+[project.scripts]
+download_statements = "bofa_scraper.download_statements:main"
+
 [project.urls]
 Homepage = "https://github.com/Wllew4/bofa_scraper"

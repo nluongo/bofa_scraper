@@ -1,5 +1,7 @@
 /dist/
 *.pyc
 /build/
+/venv/
 /*.egg-info
 test.py
+*.log
