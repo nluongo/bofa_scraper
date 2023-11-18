@@ -88,7 +88,9 @@ class ScrapeSession:
         if self.account_type == 'account':
             self.driver.find_element(By.ID, "download-transactions").click()
         else:
-            self.driver.find_element(By.NAME, "download_transactions_top").click()
+            Timeout.timeout()
+            element = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[4]/div[1]/div/div[5]/div[2]/div[2]/div/div[1]/a')
+            self.driver.execute_script("arguments[0].click();", element)
         time.sleep(1)
 
     def get_period_list_element(self):
@@ -122,6 +124,7 @@ class ScrapeSession:
         return period_str
             
     def select_filetype(self, ftype='csv'):
+        Timeout.timeout()
         if self.account_type == 'account':
             select_ftype = Select(self.driver.find_element(By.ID, "select_fileType"))   
         else:
@@ -145,9 +148,8 @@ class ScrapeSession:
             self.driver.find_element(By.ID, 'btn-download-txn').click()
         else:
             Timeout.timeout()
-            #self.driver.find_element(By.CLASS_NAME, 'submit-download').click()
             element = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[4]/div[1]/div/div[5]/div[2]/div[2]/div/div[3]/div/div[4]/div[2]/a')
-            self.driver.execute_script("arguments[0].click();", element)
+            ActionChains(self.driver).move_to_element(element).click().perform()
 
     def get_statement(self, period='cur'):
         self.prepare_transaction_menu()
@@ -167,8 +169,6 @@ class ScrapeSession:
         i = 0
         for period_element in period_list_element.options:
             name = period_element.get_attribute('name')
-            print(f'Period element: {name}')
-            print(f'Period text: {period_element.text}')
             if i > period_limit - 1:
                 break
             period_text = period_element.text
@@ -182,6 +182,7 @@ class ScrapeSession:
             latest_file = max(list_of_files, key=os.path.getctime)
             period_str = self.format_period_str(period_element)
             renamed_file = f'{self.download_dir}stmt_{self.short_name}_{period_str}'
+            print(f'Renamed file: {renamed_file}')
             os.rename(latest_file, renamed_file)
             if self.account_type != 'account':
                 self.prepare_transaction_menu()

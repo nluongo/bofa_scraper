@@ -7,6 +7,8 @@ def main():
         with open(Path.home()/'login.txt') as f:
             username, pwd, download_dir, account_short_names = f.readlines()
 
+        username, pwd, download_dir = username.strip(), pwd.strip(), download_dir.strip()
+        print(f'Download directory: {download_dir}')
         scraper = BofAScraper(
             username,
             pwd,
@@ -15,6 +17,7 @@ def main():
         )   
 
         account_short_names = account_short_names.split(',')
+        account_short_names = [name.strip() for name in account_short_names]
 
         Log.log('About to login')
         scraper.login()
