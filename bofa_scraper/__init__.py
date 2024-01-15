@@ -15,7 +15,7 @@ class BofAScraper:
     driver: webdriver.Firefox
     logged_in = False
 
-    def __init__(self, online_id: str, passcode: str, download_dir: str, timeout_duration=3, verbose=True, headless=False):
+    def __init__(self, online_id: str, passcode: str, download_dir: str, timeout_duration=3, verbose=True, headless=True):
         self.creds["id"] = online_id
         self.creds["passcode"] = passcode
         self.download_dir = download_dir
